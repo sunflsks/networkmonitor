@@ -7,6 +7,11 @@ import sqlite3
 import time
 import sys
 import re
+import os
+import sys
+
+sys.path.append(os.getcwd())
+from GPS import get_gps_position, GPSPosition
 
 QMICLI_GET_INFO = "/usr/local/bin/qmicli-get-info"
 
@@ -71,7 +76,7 @@ def ping_and_save(interface):
             ["ping", "-c", "1", "-I", interface, "google.com"], stderr=subprocess.STDOUT
         )
         qmi_output = subprocess.check_output(
-            ["./qmicli_get_info"], stderr=subprocess.STDOUT
+            [QMICLI_GET_INFO], stderr=subprocess.STDOUT
         )
         ping_result = ping_output.decode("utf-8")
         qmi_result = qmi_output.decode("utf-8")
@@ -84,6 +89,8 @@ def ping_and_save(interface):
 
     rssi = itemgetter("RSSI")(extract_qmi_values(qmi_result))
 
+    gpsinfo = get_gps_position()
+
     # Inserting result into database
     cursor.execute(
         "INSERT INTO results (timestamp, ip_address, latency, packet_dropped) VALUES (CURRENT_TIMESTAMP, ?, ?, ?)",
@@ -92,8 +99,9 @@ def ping_and_save(interface):
     db_connection.commit()
 
     print(
-        f"PING RESULTS: {ip_address}@{datetime.datetime.now()}: {latency} milliseconds, was packet dropped? {packet_dropped}. RSSI: {rssi}"
+        f"PING RESULTS: {ip_address}@{datetime.datetime.now()}: {latency} milliseconds, was packet dropped? {packet_dropped}. RSSI: {rssi}. Taken at {gpsinfo.latitude}, {gpsinfo.longitude}"
     )
+    print(gpsinfo.success)
 
 
 if __name__ == "__main__":
