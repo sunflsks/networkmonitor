@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ $UID -ne 0 ]; then
     echo "Please run as root"
