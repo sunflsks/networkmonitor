@@ -1,4 +1,6 @@
 ping_results.db
+# macOS resources fork files caused by copying por sshfs (why idk)
+._*
 # Created by https://www.toptal.com/developers/gitignore/api/python
 # Edit at https://www.toptal.com/developers/gitignore?templates=python
 

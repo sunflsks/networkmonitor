@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS results (
     timestamp DATETIME,
     ip_address TEXT,
     latency REAL,
+    rssi REAL,
     packet_dropped INTEGER,
     latitude REAL,
     longitude REAL
@@ -97,8 +98,15 @@ def ping_and_save(interface):
 
     # Inserting result into database
     cursor.execute(
-        "INSERT INTO results (timestamp, ip_address, latency, packet_dropped, latitude, longitude) VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?)",
-        (ip_address, latency, packet_dropped, gpsinfo.latitude, gpsinfo.longitude),
+        "INSERT INTO results (timestamp, ip_address, latency, rssi, packet_dropped, latitude, longitude) VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?)",
+        (
+            ip_address,
+            latency,
+            rssi,
+            packet_dropped,
+            gpsinfo.latitude,
+            gpsinfo.longitude,
+        ),
     )
     db_connection.commit()
 
