@@ -15,7 +15,8 @@ sys.path.append(os.getcwd())
 from GPS import get_gps_position, GPSPosition
 
 QMICLI_GET_INFO = "/usr/local/bin/qmicli-get-info"
-INTERFACE = "wwan0"
+INTERFACE = "wlan0"
+PING_ADDRESS = "8.8.8.8"
 
 # Database setup
 db_connection = sqlite3.connect("ping_results.db")
@@ -75,9 +76,8 @@ def extract_ping_details(ping_output):
 
 def ping_and_save(interface):
     try:
-        # Replace 'google.com' with your target
         ping_output = subprocess.check_output(
-            ["ping", "-c", "1", "-I", interface, "google.com"], stderr=subprocess.STDOUT
+            ["ping", "-c", "1", "-I", interface, PING_ADDRESS], stderr=subprocess.STDOUT
         )
         qmi_output = subprocess.check_output(
             [QMICLI_GET_INFO], stderr=subprocess.STDOUT
@@ -127,11 +127,11 @@ def check_network_is_up():
         print("No IP address assigned to interface")
         return False
 
-    # Final check: ping google.com to see if we have a connection
+    # Final check: ping cloudflare to see if we have a connection
     try:
-        subprocess.check_output(["ping", "-c", "1", "google.com", "-I", INTERFACE])
+        subprocess.check_output(["ping", "-c", "1", PING_ADDRESS, "-I", INTERFACE])
     except subprocess.CalledProcessError:
-        print("Could not ping google.com")
+        print(f"Could not ping {PING_ADDRESS}")
         return False
 
     return True
