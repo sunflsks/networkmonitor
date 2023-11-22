@@ -4,6 +4,7 @@ from operator import itemgetter
 import subprocess
 import datetime
 import sqlite3
+import netifaces
 import time
 import sys
 import re
@@ -14,6 +15,7 @@ sys.path.append(os.getcwd())
 from GPS import get_gps_position, GPSPosition
 
 QMICLI_GET_INFO = "/usr/local/bin/qmicli-get-info"
+INTERFACE = "wwan0"
 
 # Database setup
 db_connection = sqlite3.connect("ping_results.db")
@@ -103,13 +105,45 @@ def ping_and_save(interface):
     print(
         f"PING RESULTS: {ip_address}@{datetime.datetime.now()}: {latency} milliseconds, was packet dropped? {packet_dropped}. RSSI: {rssi}. Taken at {gpsinfo.latitude}, {gpsinfo.longitude}"
     )
-    print(gpsinfo.success)
+
+
+def check_network_is_up():
+    # Check if interface exists
+    if not os.path.exists(f"/sys/class/net/{INTERFACE}"):
+        print("Interface does not exist")
+        return False
+
+    # Check if interface is up (only administrative; does not check if there is a connection)
+    with open(f"/sys/class/net/{INTERFACE}/flags", "r") as f:
+        flags = f.read()
+        if int(flags, base=16) & 1 == 0:
+            print("Interface is down")
+            return False
+
+    # Check if interface has *a* IP address assigned to it
+    try:
+        ip_address = netifaces.ifaddresses(INTERFACE)[netifaces.AF_INET][0]["addr"]
+    except KeyError:
+        print("No IP address assigned to interface")
+        return False
+
+    # Final check: ping google.com to see if we have a connection
+    try:
+        subprocess.check_output(["ping", "-c", "1", "google.com", "-I", INTERFACE])
+    except subprocess.CalledProcessError:
+        print("Could not ping google.com")
+        return False
+
+    return True
 
 
 if __name__ == "__main__":
-    interface = "wwan0"  # Replace with your network interface
+    if not check_network_is_up():
+        print("Network is not available, maybe run setup script? Exiting...")
+        sys.exit(1)
+
     while True:
-        ping_and_save(interface)
+        ping_and_save(INTERFACE)
         time.sleep(5)
 
 # Don't forget to close the database connection when you're done
