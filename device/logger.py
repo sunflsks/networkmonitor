@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from operator import itemgetter
+import RPi.GPIO as GPIO
 import subprocess
 import datetime
 import sqlite3
@@ -11,15 +12,17 @@ import re
 import os
 import sys
 
-sys.path.append(os.getcwd())
+sys.path.append("/home/sunchipnacho/networkmonitor/device")
 from GPS import get_gps_position, GPSPosition
 
 QMICLI_GET_INFO = "/usr/local/bin/qmicli-get-info"
-INTERFACE = "wlan0"
+INTERFACE = "wwan0"
 PING_ADDRESS = "8.8.8.8"
+DB_LOCATION = "/usr/local/share/ping_results.db"
+LED_PIN = 17
 
 # Database setup
-db_connection = sqlite3.connect("ping_results.db")
+db_connection = sqlite3.connect(DB_LOCATION)
 cursor = db_connection.cursor()
 cursor.execute(
     """
@@ -110,6 +113,10 @@ def ping_and_save(interface):
     )
     db_connection.commit()
 
+    GPIO.output(LED_PIN, GPIO.HIGH)
+    time.sleep(0.5)
+    GPIO.output(LED_PIN, GPIO.LOW)
+
     print(
         f"PING RESULTS: {ip_address}@{datetime.datetime.now()}: {latency} milliseconds, was packet dropped? {packet_dropped}. RSSI: {rssi}. Taken at {gpsinfo.latitude}, {gpsinfo.longitude}"
     )
@@ -150,9 +157,12 @@ if __name__ == "__main__":
         print("Network is not available, maybe run setup script? Exiting...")
         sys.exit(1)
 
+    print("Starting...")
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(LED_PIN, GPIO.OUT)
     while True:
         ping_and_save(INTERFACE)
-        time.sleep(5)
+        time.sleep(3)
 
 # Don't forget to close the database connection when you're done
 db_connection.close()
