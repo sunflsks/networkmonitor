@@ -1,0 +1,16 @@
+{
+  "name": "networkmonitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "beefy": "^2.1.8",
+    "browserify": "^17.0.0",
+    "leaflet": "^1.9.4"
+  }
+}
