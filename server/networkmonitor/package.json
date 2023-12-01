@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "npm run build && node ./bin/www",
-    "build": "browserify webmap.js | terser --compress --mangle > public/javascripts/bundle.js & cp node_modules/leaflet/dist/leaflet.css public/stylesheets/leaflet.css"
+    "build": "browserify webmap.js -o public/javascripts/bundle.js & cp node_modules/leaflet/dist/leaflet.css public/stylesheets/leaflet.css",
+    "bundle": "browserify webmap.js | terser --compress --mangle > public/javascripts/bundle.js & cp node_modules/leaflet/dist/leaflet.css public/stylesheets/leaflet.css"
   },
   "dependencies": {
     "cookie-parser": "~1.4.3",
