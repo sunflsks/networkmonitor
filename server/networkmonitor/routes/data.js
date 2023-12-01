@@ -2,7 +2,7 @@ var express = require('express');
 var sqlite = require('sqlite3');
 var router = express.Router();
 
-const DB_PATH="/Users/sunchipnacho/Source/networkmonitor/ping_results.db";
+const DB_PATH="/usr/local/share/ping_results.db";
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
