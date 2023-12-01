@@ -44,7 +44,8 @@ hexLayer
   .radiusValue(function(d) { return d.length; });
 
 setTimeout(function() {
-	fetch('http://localhost:3000/data')
+	const data_url = location.origin + "/data";
+	fetch(data_url)
 	.then(response => response.json())
 	.then(data => {
 	  toadd = []
