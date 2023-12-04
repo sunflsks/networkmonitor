@@ -11,9 +11,7 @@ import sys
 import re
 import os
 import sys
-
-sys.path.append("/home/sunchipnacho/networkmonitor/device")
-from GPS import get_gps_position, GPSPosition
+from gps import get_gps_position, GPSPosition
 
 QMICLI_GET_INFO = "/usr/local/bin/qmicli-get-info"
 INTERFACE = "wwan0"
