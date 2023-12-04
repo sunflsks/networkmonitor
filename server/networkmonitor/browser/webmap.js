@@ -1,7 +1,7 @@
 require('leaflet');
 require('d3/dist/d3')
 require('d3-hexbin/build/d3-hexbin.min')
-require('./js/leaflet-d3')
+require('./leaflet-d3')
 
 // Creates a leaflet map binded to an html <div> with id "map"
 // setView will set the initial map view to the location at coordinates

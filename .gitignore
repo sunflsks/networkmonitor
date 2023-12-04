@@ -1,6 +1,4 @@
 ping_results.db
-server/networkmonitor/node_modules
-server/networkmonitor/public/javascripts/bundle.js
 # macOS resources fork files caused by copying por sshfs (why idk)
 ._*
 # Created by https://www.toptal.com/developers/gitignore/api/python,node
