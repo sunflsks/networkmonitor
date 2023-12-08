@@ -1,9 +1,9 @@
-let express = require('express');
-let router = express.Router();
+const express = require('express')
+const router = express.Router()
 
 // Test route
-router.get('/', function(req, res, next) {
-  res.send("Hello World!");
-});
+router.get('/', function (req, res, next) {
+  res.send('Hello World!')
+})
 
-module.exports = router;
+module.exports = router

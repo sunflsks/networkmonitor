@@ -1,22 +1,22 @@
-let express = require('express');
-let path = require('path');
-let cookieParser = require('cookie-parser');
-let logger = require('morgan');
+const express = require('express')
+const path = require('path')
+const cookieParser = require('cookie-parser')
+const logger = require('morgan')
 
-let indexRouter = require('./routes/index');
-let dataRouter = require('./routes/data');
-let uploadRouter = require('./routes/upload');
+const indexRouter = require('./routes/index')
+const dataRouter = require('./routes/data')
+const uploadRouter = require('./routes/upload')
 
-let app = express();
+const app = express()
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(logger('dev'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/', indexRouter);
-app.use('/data', dataRouter);
+app.use('/', indexRouter)
+app.use('/data', dataRouter)
 app.use('/upload', uploadRouter)
 
-module.exports = app;
+module.exports = app
