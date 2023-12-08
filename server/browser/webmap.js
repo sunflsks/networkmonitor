@@ -6,25 +6,25 @@ require('./leaflet-d3')
 // Creates a leaflet map binded to an html <div> with id "map"
 // setView will set the initial map view to the location at coordinates
 // 13 represents the initial zoom level with higher values being more zoomed in
-var map = L.map('map', { center: [32.906950, -96.950270], zoom: 15 })
+let map = L.map('map', { center: [32.906950, -96.950270], zoom: 15 })
 
 // Adds the basemap tiles to your web map
 // Additional providers are available at: https://leaflet-extras.github.io/leaflet-providers/preview/
-var osm_mapnik = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+let osm_mapnik = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
 	attribution: '&copy; OSM Mapnik <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-var options = {
+let options = {
 	radius: 12,
 	opacity: 1,
 	duration: 500,
 	colorRange: ['#660000', '#5af019']
 };
 
-var hexLayer = L.hexbinLayer(options).addTo(map)
+let hexLayer = L.hexbinLayer(options).addTo(map)
 
-var rssiToColorValue = function (rssi) {
+let rssiToColorValue = function (rssi) {
 	if (rssi > -65) { return 5; }
 	if (rssi > -75) { return 4; }
 	if (rssi > -85) { return 3; }
