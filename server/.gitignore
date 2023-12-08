@@ -1,2 +1,3 @@
 node_modules
 server/public/javascripts/bundle.js
+server/db/authinfo.js
