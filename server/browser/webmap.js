@@ -1,7 +1,12 @@
+/* global L */
+
 require('leaflet')
 require('d3/dist/d3')
 require('d3-hexbin/build/d3-hexbin.min')
 require('./leaflet-d3')
+
+const RED = '#660000'
+const GREEN = '5af019'
 
 // Creates a leaflet map binded to an html <div> with id "map"
 // setView will set the initial map view to the location at coordinates
@@ -10,7 +15,7 @@ const map = L.map('map', { center: [32.906950, -96.950270], zoom: 15 })
 
 // Adds the basemap tiles to your web map
 // Additional providers are available at: https://leaflet-extras.github.io/leaflet-providers/preview/
-const osm_mapnik = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; OSM Mapnik <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map)
@@ -19,7 +24,7 @@ const options = {
   radius: 12,
   opacity: 1,
   duration: 500,
-  colorRange: ['#660000', '#5af019']
+  colorRange: [RED, GREEN]
 }
 
 const hexLayer = L.hexbinLayer(options).addTo(map)
@@ -38,7 +43,6 @@ hexLayer
   .lat(function (d) { return d[0] })
   .colorValue(function (d, i) {
     const rssi = d[0].o[2]
-    console.log(rssi)
     return rssiToColorValue(rssi)
   })
   .radiusValue(function (d) { return d.length })
@@ -46,20 +50,27 @@ hexLayer
 // Set initial date to beginning of time
 let date = new Date(0)
 
-// Some values may be skipped every now and then; will need to fix this later
-setTimeout(function () {
-  const data_url = location.origin + `/data?timestamp=${date.getTime()}`
-  fetch(data_url)
+function downloadData () {
+  const dataURL = location.origin + `/data?timestamp=${date.getTime()}`
+  fetch(dataURL)
     .then(response => response.json())
     .then(data => {
-      toadd = []
+      const toadd = []
       data.forEach(function (d) {
-        if (d.latitude == null || d.longitude == null) { return }
+        if (d.coordinates.x == null || d.coordinates.y == null) { return }
+        const latitude = d.coordinates.x
+        const longitude = d.coordinates.y
         d.rssi = parseInt(d.rssi)
-        toadd.push([d.latitude, d.longitude, d.rssi])
+        toadd.push([latitude, longitude, d.rssi])
       })
 
-      hexLayer.data(toadd).addTo(map)
+      console.log(toadd)
+      if (toadd.length > 0) { hexLayer.data(toadd).addTo(map) }
     })
   date = new Date()
-}, 10000)
+
+  setTimeout(downloadData, 10000)
+}
+
+// Some values may be skipped every now and then; will need to fix this later
+downloadData()
