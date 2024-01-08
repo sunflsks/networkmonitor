@@ -8,13 +8,13 @@ fi
 # HARDWARE PREREQUISITES:
 # SIM installed, modem connected (THRU USB, NOT USB->UART)
 
-USBPATH="/dev/ttyUSB2"
+USBPATH="/dev/ttyS0"
 
-apt install socat
+#apt install socat
 
 # First, completely disable ModemManager, as it conflicts with qmicli
-systemctl unmask ModemManager.service
-systemctl disable ModemManager.service
+#systemctl unmask ModemManager.service
+#systemctl disable ModemManager.service
 
 # First, completely reset modem to factory settings
 echo "AT&F" | socat - "$USBPATH"
