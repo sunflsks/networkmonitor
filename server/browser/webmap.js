@@ -5,9 +5,6 @@ require('d3/dist/d3')
 require('d3-hexbin/build/d3-hexbin.min')
 require('./leaflet-d3')
 
-const RED = '#660000'
-const GREEN = '5af019'
-
 // Creates a leaflet map binded to an html <div> with id "map"
 // setView will set the initial map view to the location at coordinates
 // 13 represents the initial zoom level with higher values being more zoomed in
@@ -24,7 +21,7 @@ const options = {
   radius: 12,
   opacity: 1,
   duration: 500,
-  colorRange: [RED, GREEN]
+  colorRange: ['darkred', 'green']
 }
 
 const hexLayer = L.hexbinLayer(options).addTo(map)
@@ -48,11 +45,21 @@ hexLayer
   .radiusValue(function (d) { return d.length })
 
 // Set initial date to beginning of time
-let date = new Date(0)
 
-function downloadData () {
-  const dataURL = location.origin + `/data?timestamp=${date.getTime()}`
-  fetch(dataURL)
+function updateMap (e) {
+  console.log(`Event handler called with event type: ${e.type}`)
+  // Get the current map bounds
+  const bounds = map.getBounds()
+
+  // Extract corners from bounds
+  const sw = bounds.getSouthWest()
+  const ne = bounds.getNorthEast()
+
+  // Construct the URL to call
+  const url = `${location.origin}/data?swlat=${sw.lat}&swlng=${sw.lng}&nelat=${ne.lat}&nelng=${ne.lng}&timestamp=0`
+
+  // Fetch the data from the server
+  fetch(url)
     .then(response => response.json())
     .then(data => {
       const toadd = []
@@ -65,12 +72,13 @@ function downloadData () {
       })
 
       console.log(toadd)
-      if (toadd.length > 0) { hexLayer.data(toadd).addTo(map) }
+      if (toadd.length > 0) {
+        hexLayer.data(toadd).addTo(map)
+      }
     })
-  date = new Date()
-
-  setTimeout(downloadData, 10000)
 }
 
-// Some values may be skipped every now and then; will need to fix this later
-downloadData()
+map.on('moveend', updateMap)
+
+// On page load, download data once
+updateMap({ type: 'load' })
