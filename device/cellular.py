@@ -9,7 +9,7 @@ import time
 import sys
 import re
 import os
-from gps import get_gps_position, get_gps_position_test, GPSPosition
+from gps import get_gps_position, GPSPosition
 
 QMICLI_GET_INFO = "/usr/local/lib/networkmonitor/qmicli-get-info"
 TEST_IP = "8.8.8.8"
@@ -23,6 +23,7 @@ class PingResult(BaseModel):
         latency: int
         packet_dropped: bool
         timestamp: int = time.time_ns() // 1000000
+        success: bool = False
 
 def extract_qmi_values(text):
     pattern = r"(\w+):\s'(-?\d+\.?\d* dBm?)'"
@@ -72,7 +73,12 @@ def ping(interface, ip):
 
     ping_details["rssi"] = int(itemgetter("RSSI")(extract_qmi_values(qmi_result)).split(" ")[0])
 
-    ping_details["gpsinfo"] = get_gps_position_test()
+    gpsinfo = get_gps_position()
+    if gpsinfo.success:
+        ping_details["gpsinfo"] = gpsinfo
+    else:
+        print("GPS failed, not returning anything")
+        return None
 
     return PingResult(**ping_details)
 

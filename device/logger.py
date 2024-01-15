@@ -2,8 +2,8 @@
 
 import sys
 import time
-from utils import LockableObject, RepeatedTimer, generate_random_ping
 from upload import upload_data
+from utils import LockableObject, RepeatedTimer, generate_random_ping
 from cellular import ping, check_network_is_up, PingResult, extract_qmi_values
 
 INTERFACE = "wwan0"
@@ -24,7 +24,6 @@ if __name__ == "__main__":
         result = ping(INTERFACE, PING_ADDRESS)
         with ping_results:
             print(result)
-            ping_results.value.append(result)
+            if result is not None:
+                ping_results.value.append(result)
         time.sleep(3)
-
-        print(ping_results.value)
