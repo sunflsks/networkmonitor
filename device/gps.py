@@ -31,8 +31,8 @@ class SerialResponse:
 
 class GPSPosition(BaseModel):
     success: bool = False
-    latitude: int
-    longitude: int
+    latitude: float
+    longitude: float
 
 def send_at(command, back, timeout):
     rec_buff = ""
@@ -52,7 +52,8 @@ def send_at(command, back, timeout):
 
 def get_gps_position() -> GPSPosition:
     obtaining_lock = True
-    answer = 0
+    send_at("AT+CGPS=1,1", "OK", 1)
+    time.sleep(0.5)
 
     while obtaining_lock:
         response = send_at("AT+CGPSINFO", "+CGPSINFO: ", 1)
@@ -62,16 +63,12 @@ def get_gps_position() -> GPSPosition:
                 obtaining_lock = True
                 time.sleep(1)
             else:
+                send_at("AT+CGPS=0", "OK", 1)
                 return parse_gps_position(response.buffer)
 
         else:
-            print(f"error")
-            send_at("AT+CGPS=0", "OK", 1)
+            print("error getting gps position")
             return GPSPosition(success=False, latitude=0, longitude=0)
-        time.sleep(1.5)
-
-def get_gps_position_test() -> GPSPosition:
-    return GPSPosition(success=True, latitude=0, longitude=0)
 
 def extract_between_digits(s):
     # Find the first digit
@@ -100,7 +97,6 @@ def parse_gps_position(gps_info):
     # Convert to decimal format
     lat_decimal = convert_to_decimal(lat_value, lat_direction, True)
     lon_decimal = convert_to_decimal(lon_value, lon_direction, False)
-
     return GPSPosition(success=True, latitude=lat_decimal, longitude=lon_decimal)
 
 
