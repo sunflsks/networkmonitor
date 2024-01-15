@@ -4,26 +4,25 @@ import RPi.GPIO as GPIO
 import subprocess
 import datetime
 import sqlite3
+import constants
 import netifaces
 import time
 import sys
 import re
 import os
-from gps import get_gps_position, GPSPosition
+from gps import GPSPosition
 
-QMICLI_GET_INFO = "/usr/local/lib/networkmonitor/qmicli-get-info"
-TEST_IP = "8.8.8.8"
-LED_PIN = 17
 
 class PingResult(BaseModel):
-        rssi: int
-        gpsinfo: GPSPosition
-        hostname: str
-        ip_address: str
-        latency: int
-        packet_dropped: bool
-        timestamp: int = time.time_ns() // 1000000
-        success: bool = False
+    rssi: int
+    gpsinfo: GPSPosition = None  # type: ignore
+    hostname: str
+    ip_address: str
+    latency: int
+    packet_dropped: bool
+    timestamp: int = time.time_ns() // 1000000
+    success: bool = False
+
 
 def extract_qmi_values(text):
     pattern = r"(\w+):\s'(-?\d+\.?\d* dBm?)'"
@@ -61,7 +60,7 @@ def ping(interface, ip):
             ["ping", "-c", "1", "-I", interface, ip], stderr=subprocess.STDOUT
         )
         qmi_output = subprocess.check_output(
-            [QMICLI_GET_INFO], stderr=subprocess.STDOUT
+            [constants.QMICLI_GET_INFO], stderr=subprocess.STDOUT
         )
         ping_result = ping_output.decode("utf-8")
         qmi_result = qmi_output.decode("utf-8")
@@ -70,15 +69,9 @@ def ping(interface, ip):
         sys.exit(1)
 
     ping_details = extract_ping_details(ping_result)
-
-    ping_details["rssi"] = int(itemgetter("RSSI")(extract_qmi_values(qmi_result)).split(" ")[0])
-
-    gpsinfo = get_gps_position()
-    if gpsinfo.success:
-        ping_details["gpsinfo"] = gpsinfo
-    else:
-        print("GPS failed, not returning anything")
-        return None
+    ping_details["rssi"] = int(
+        itemgetter("RSSI")(extract_qmi_values(qmi_result)).split(" ")[0]
+    )
 
     return PingResult(**ping_details)
 
@@ -103,11 +96,13 @@ def check_network_is_up(interface):
         print("No IP address assigned to interface")
         return False
 
-    # Final check: ping cloudflare to see if we have a connection
+    # Final check: ping address to see if we have a connection
     try:
-        subprocess.check_output(["ping", "-c", "1", TEST_IP, "-I", interface])
+        subprocess.check_output(
+            ["ping", "-c", "1", constants.PING_ADDRESS, "-I", interface]
+        )
     except subprocess.CalledProcessError:
-        print(f"Could not ping {ip}")
+        print(f"Could not ping {constants.PING_ADDRESS}")
         return False
 
     return True
