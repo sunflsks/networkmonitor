@@ -12,16 +12,14 @@ class PingResultList(BaseModel):
     __root__: List[PingResult]
 
 
-def upload_data(results: LockableObject):
+def upload_data(results: List[PingResult]):
     print("Uploading data to the server...")
 
-    with results:
-        if results.value == []:
-            print("No data to upload.")
-            return
-        ping_list = PingResultList.parse_obj(results.value).dict()
-        upload_dict = {"points": ping_list["__root__"], "device": constants.DEVICE}
+    if results == []:
+        print("No data to upload.")
+        return
+    ping_list = PingResultList.parse_obj(results).dict()
+    upload_dict = {"points": ping_list["__root__"], "device": constants.DEVICE}
 
-        r = requests.post(f"{constants.SERVER_URL}/upload", json=upload_dict)
-        print(f"Uploaded Ping Result: Response is '{r}'\n")
-        results.value = []
+    r = requests.post(f"{constants.SERVER_URL}/upload", json=upload_dict)
+    print(f"Uploaded Ping Result: Response is '{r}'\n")
