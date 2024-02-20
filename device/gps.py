@@ -34,6 +34,7 @@ class GPSPosition(BaseModel):
     latitude: float
     longitude: float
 
+
 def send_at(command, back, timeout):
     rec_buff = ""
     ser.write((command + "\r\n").encode())
@@ -70,14 +71,15 @@ def get_gps_position() -> GPSPosition:
             print("error getting gps position")
             return GPSPosition(success=False, latitude=0, longitude=0)
 
+
 def extract_between_digits(s):
     # Find the first digit
-    first_digit_match = re.search(r'\d', s)
+    first_digit_match = re.search(r"\d", s)
     if not first_digit_match:
         return None  # No digits found
 
     # Find the last digit
-    last_digit_match = re.search(r'\d(?=[^\d]*$)', s)
+    last_digit_match = re.search(r"\d(?=[^\d]*$)", s)
     if not last_digit_match:
         return None  # This shouldn't happen if the first digit is found
 
@@ -85,6 +87,7 @@ def extract_between_digits(s):
     start = first_digit_match.start()
     end = last_digit_match.end()
     return s[start:end]
+
 
 def parse_gps_position(gps_info):
     # Remove "+CGPSINFO:" and then split the string by comma
