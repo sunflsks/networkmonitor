@@ -20,8 +20,12 @@ class PingResult(BaseModel):
     ip_address: str
     latency: int
     packet_dropped: bool
-    timestamp: int = time.time_ns() // 1000000
+    timestamp: int = 0
     success: bool = False
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.timestamp = time.time_ns() // 1000000
 
 
 def extract_qmi_values(text):
