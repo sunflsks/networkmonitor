@@ -12,7 +12,7 @@ class PingResultList(BaseModel):
     __root__: List[PingResult]
 
 
-def upload_data(results: List[PingResult]):
+def upload_data(results: List[PingResult]) -> None:
     print("Uploading data to the server...")
 
     if results == []:
@@ -22,4 +22,4 @@ def upload_data(results: List[PingResult]):
     upload_dict = {"points": ping_list["__root__"], "device": constants.DEVICE}
 
     r = requests.post(f"{constants.SERVER_URL}/upload", json=upload_dict)
-    print(f"Uploaded Ping Result: Response is '{r}'\n")
+    print(f"UPLOADED SUCCESSFULLY: Response is '{r}'\n")

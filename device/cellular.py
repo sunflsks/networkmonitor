@@ -28,13 +28,13 @@ class PingResult(BaseModel):
         self.timestamp = time.time_ns() // 1000000
 
 
-def extract_qmi_values(text):
+def extract_qmi_values(text) -> dict:
     pattern = r"(\w+):\s'(-?\d+\.?\d* dBm?)'"
     matches = re.findall(pattern, text)
     return {key: value for key, value in matches}
 
 
-def extract_ping_details(ping_output):
+def extract_ping_details(ping_output) -> dict:
     ip_regex = r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"
     hostname_regex = r"PING\s+(\S+)"
     latency_regex = r"time=(\d+\.?\d*)\s*ms"
@@ -58,7 +58,7 @@ def extract_ping_details(ping_output):
     }
 
 
-def ping(interface, ip):
+def ping(interface, ip) -> PingResult:
     try:
         ping_output = subprocess.check_output(
             ["ping", "-c", "1", "-I", interface, ip], stderr=subprocess.STDOUT
@@ -80,7 +80,7 @@ def ping(interface, ip):
     return PingResult(**ping_details)
 
 
-def check_network_is_up(interface):
+def check_network_is_up(interface) -> bool:
     # Check if interface exists
     if not os.path.exists(f"/sys/class/net/{interface}"):
         print("Interface does not exist")

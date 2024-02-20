@@ -47,7 +47,7 @@ class RepeatedTimer(object):
             self.is_running = False
 
 
-def generate_random_ping():
+def generate_random_ping() -> PingResult:
     return PingResult(
         hostname="example.com",
         ip_address="0.0.0.0",

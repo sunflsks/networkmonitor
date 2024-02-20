@@ -35,7 +35,7 @@ class GPSPosition(BaseModel):
     longitude: float
 
 
-def send_at(command, back, timeout):
+def send_at(command, back, timeout) -> SerialResponse:
     rec_buff = ""
     ser.write((command + "\r\n").encode())
     time.sleep(timeout)
@@ -51,9 +51,8 @@ def send_at(command, back, timeout):
         return SerialResponse(False, "none")
 
 
-def get_gps_position() -> GPSPosition:
+def get_gps_position() -> GPSPosition:  # type: ignore
     obtaining_lock = True
-    send_at("AT+CGPS=1,1", "OK", 1)
     time.sleep(0.5)
 
     while obtaining_lock:
@@ -64,7 +63,6 @@ def get_gps_position() -> GPSPosition:
                 obtaining_lock = True
                 time.sleep(1)
             else:
-                send_at("AT+CGPS=0", "OK", 1)
                 return parse_gps_position(response.buffer)
 
         else:
@@ -72,7 +70,7 @@ def get_gps_position() -> GPSPosition:
             return GPSPosition(success=False, latitude=0, longitude=0)
 
 
-def extract_between_digits(s):
+def extract_between_digits(s) -> str | None:
     # Find the first digit
     first_digit_match = re.search(r"\d", s)
     if not first_digit_match:
@@ -89,9 +87,13 @@ def extract_between_digits(s):
     return s[start:end]
 
 
-def parse_gps_position(gps_info):
+def parse_gps_position(gps_info) -> GPSPosition:
     # Remove "+CGPSINFO:" and then split the string by comma
-    parts = extract_between_digits(gps_info).split(",")
+    parts = extract_between_digits(gps_info)
+    if parts is None:
+        return GPSPosition(success=False, latitude=0, longitude=0)
+
+    parts = parts.split(",")
 
     # Extract latitude and longitude values
     lat_value, lat_direction = parts[0], parts[1]
@@ -103,7 +105,7 @@ def parse_gps_position(gps_info):
     return GPSPosition(success=True, latitude=lat_decimal, longitude=lon_decimal)
 
 
-def convert_to_decimal(value, direction, islat):
+def convert_to_decimal(value, direction, islat) -> float:
     # for some reason there is a random newline. idc why, no longer
     value = value.strip()
 

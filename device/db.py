@@ -5,7 +5,7 @@ from utils import LockableObject
 import constants
 
 
-def insert_points(results: List[PingResult]):
+def insert_points(results: List[PingResult]) -> None:
     if results == []:
         print("No data to insert into local DB.")
         return
