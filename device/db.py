@@ -30,5 +30,7 @@ def insert_points(results: List[PingResult]) -> None:
             ),
         )
 
+    print(f"Inserted {len(results)} rows into the local DB.")
+
     conn.commit()
     conn.close()

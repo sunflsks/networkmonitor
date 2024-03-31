@@ -24,7 +24,7 @@ def upload_and_insert_data() -> None:
 
 
 if __name__ == "__main__":
-    blink_led(6, 0.1)
+    blink_led(10, 0.1)
 
     if not check_network_is_up(constants.INTERFACE):
         print("Network is not available, maybe run setup script? Exiting...")
