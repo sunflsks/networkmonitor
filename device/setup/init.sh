@@ -5,6 +5,10 @@ if [ $UID -ne 0 ]; then
     exit 1
 fi
 
-mmcli -m 0 --enable
-mmcli -m 0 --simple-connect="apn=TFDATA"
+echo none > /sys/class/leds/ACT/trigger
+
+MODEM_PATH=$(mmcli --list-modems | awk '{print $1}')
+
+mmcli -m "$MODEM_PATH" --enable
+mmcli -m "$MODEM_PATH" --simple-connect="apn=TFDATA"
 udhcpc -q -f -i wwan0
