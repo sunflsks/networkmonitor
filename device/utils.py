@@ -3,6 +3,8 @@ import time
 from cellular import PingResult
 import random
 from gps import GPSPosition
+from constants import LEDCTL
+import subprocess
 
 
 class LockableObject:
@@ -56,3 +58,11 @@ def generate_random_ping() -> PingResult:
         rssi=random.randint(-100, 0),
         gpsinfo=GPSPosition(success=False, latitude=-100, longitude=100),
     )
+
+
+def blink_led(count, interval):
+    for i in range(count):
+        subprocess.run([LEDCTL, "on"])
+        time.sleep(interval)
+        subprocess.run([LEDCTL, "off"])
+        time.sleep(interval)
