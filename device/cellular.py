@@ -58,7 +58,7 @@ def extract_ping_details(ping_output) -> dict:
     }
 
 
-def ping(interface, ip) -> PingResult:
+def ping(interface, ip) -> PingResult | None:
     try:
         ping_output = subprocess.check_output(
             ["ping", "-c", "1", "-I", interface, ip], stderr=subprocess.STDOUT
@@ -69,8 +69,8 @@ def ping(interface, ip) -> PingResult:
         ping_result = ping_output.decode("utf-8")
         qmi_result = qmi_output.decode("utf-8")
     except subprocess.CalledProcessError as e:
-        print(f"Got error {e}: exiting")
-        sys.exit(1)
+        print(f"Got error {e}: skipping")
+        return None
 
     ping_details = extract_ping_details(ping_result)
     ping_details["rssi"] = int(
