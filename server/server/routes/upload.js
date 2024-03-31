@@ -14,8 +14,10 @@ router.post('/', async (req, res) => {
   const device = data.device
   const points = data.points
 
-  console.log(data)
+  console.log(`Received upload request from ${req.headers['x-forwarded-for'] || req.socket.remoteAddress}`)
 
+  console.log(data)
+  // data validation !!!
   // Function to transform and insert data
   const insertData = async (data) => {
     try {
@@ -25,15 +27,15 @@ router.post('/', async (req, res) => {
       `
 
       for (const item of points) {
-        console.log(`point ${item.timestamp} inserted`)
+        console.log(`point ${item.timestamp} inserted at ${item.gpsinfo.latitude}, ${item.gpsinfo.longitude}`)
         const values = [
           new Date(item.timestamp),
           item.ip_address,
           item.latency,
           item.rssi,
           item.packet_dropped,
-          item.latitude,
-          item.longitude,
+          item.gpsinfo.latitude,
+          item.gpsinfo.longitude,
           device,
           item.provider
         ]
