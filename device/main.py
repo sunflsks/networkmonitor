@@ -6,7 +6,7 @@ import constants
 from upload import upload_data
 from db import insert_points
 from gps import get_gps_position
-from utils import LockableObject, RepeatedTimer
+from utils import LockableObject, RepeatedTimer, blink_led
 from cellular import ping, check_network_is_up
 
 ping_results = LockableObject([])
@@ -24,6 +24,8 @@ def upload_and_insert_data() -> None:
 
 
 if __name__ == "__main__":
+    blink_led(6, 0.1)
+
     if not check_network_is_up(constants.INTERFACE):
         print("Network is not available, maybe run setup script? Exiting...")
         sys.exit(1)
@@ -45,5 +47,6 @@ if __name__ == "__main__":
         print(result)
 
         if result is not None:
+            blink_led(1, 0.5)
             ping_results.value.append(result)
         time.sleep(3)
