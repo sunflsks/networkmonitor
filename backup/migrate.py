@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sqlite3
 import sys
 import psycopg2
@@ -5,8 +7,8 @@ from psycopg2 import sql
 from datetime import datetime
 
 # Function to parse and format timestamp
-def format_timestamp(iso_timestamp):
-    return datetime.fromisoformat(iso_timestamp).strftime('%Y-%m-%d %H:%M:%S')
+def format_timestamp(timestamp):
+    return datetime.fromtimestamp(timestamp/1000).strftime('%Y-%m-%d %H:%M:%S')
 
 # Function to extract and convert RSSI to integer
 def convert_rssi(rssi_str):
@@ -16,13 +18,12 @@ def convert_rssi(rssi_str):
 # Function to transform data
 def transform_data(row):
     formatted_timestamp = format_timestamp(row[0])
-    # Convert RSSI to integer
-    rssi_int = convert_rssi(row[3])
+    rssi = row[3]
     # Convert packet_dropped to boolean
     packet_dropped = row[4] == 1
     # Convert latitude and longitude to point
     coordinates = f"({row[5]}, {row[6]})"
-    return (formatted_timestamp,) + row[1:3] + (rssi_int,) + (packet_dropped, coordinates)
+    return (formatted_timestamp,) + row[1:3] + (row[3],) + (packet_dropped, coordinates)
 
 
 # Connect to SQLite database
