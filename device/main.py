@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     print("Starting...")
 
-    _ = RepeatedTimer(10, upload_and_insert_data)
+    _ = RepeatedTimer(constants.UPLOAD_INTERVAL, upload_and_insert_data)
 
     while True:
         time.sleep(3)
