@@ -4,6 +4,7 @@
 # credit to waveshare
 
 from os import times
+from utils import blink_led
 import RPi.GPIO as GPIO
 from pydantic import BaseModel
 
@@ -60,6 +61,7 @@ def get_gps_position() -> GPSPosition:  # type: ignore
         if response.success:
             if ",,,,,," in response.buffer:
                 print("GPS is not ready yet, will retry in 1 second")
+                blink_led("PWR", 1, 0.5)
                 obtaining_lock = True
                 time.sleep(1)
             else:

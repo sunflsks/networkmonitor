@@ -24,29 +24,35 @@ def upload_and_insert_data() -> None:
 
 
 if __name__ == "__main__":
-    blink_led(10, 0.1)
+    blink_led("PWR", 10, 0.1)
 
     if not check_network_is_up(constants.INTERFACE):
         print("Network is not available, maybe run setup script? Exiting...")
+        blink_led("PWR", 2, 0.5)
+        blink_led("ACT", 2, 0.5)
         sys.exit(1)
 
     print("Starting...")
 
-    _ = RepeatedTimer(60, upload_and_insert_data)
+    _ = RepeatedTimer(10, upload_and_insert_data)
 
     while True:
+        time.sleep(3)
         result = ping(constants.INTERFACE, constants.PING_ADDRESS)
+        if result is None:
+            print("Ping failed, skipping this attempt")
+            blink_led("PWR", 2, 0.5)
+            continue
 
         gpsinfo = get_gps_position()
         if gpsinfo.success:
             result.gpsinfo = gpsinfo
         else:
             print("GPS failed, skipping this attempt")
-            result = None
+            blink_led("PWR", 2, 0.5)
+            continue
 
         print(result)
 
-        if result is not None:
-            blink_led(1, 0.5)
-            ping_results.value.append(result)
-        time.sleep(3)
+        blink_led("ACT", 1, 0.5)
+        ping_results.value.append(result)

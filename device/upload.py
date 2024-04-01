@@ -24,6 +24,6 @@ def upload_data(results: List[PingResult]) -> None:
     r = requests.post(f"{constants.SERVER_URL}/upload", json=upload_dict)
     if r:
         print(f"UPLOADED SUCCESSFULLY: Response is '{r}'\n")
-        blink_led(3, 0.1)
+        blink_led("ACT", 3, 0.1)
     else:
         print(f"ERROR UPLOADING: Response if '{r}'\n")

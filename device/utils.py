@@ -47,9 +47,9 @@ class RepeatedTimer(object):
             self.is_running = False
 
 
-def blink_led(count, interval):
+def blink_led(led, count, interval):
     for i in range(count):
-        subprocess.run([LEDCTL, "on"])
+        subprocess.run([LEDCTL, led, "on"])
         time.sleep(interval)
-        subprocess.run([LEDCTL, "off"])
+        subprocess.run([LEDCTL, led, "off"])
         time.sleep(interval)

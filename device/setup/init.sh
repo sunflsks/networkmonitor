@@ -6,6 +6,7 @@ if [ $UID -ne 0 ]; then
 fi
 
 echo none > /sys/class/leds/ACT/trigger
+echo none > /sys/class/leds/PWR/trigger
 
 MODEM_PATH=$(mmcli --list-modems | awk '{print $1}')
 
