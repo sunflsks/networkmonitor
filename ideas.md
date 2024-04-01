@@ -1,3 +1,0 @@
-- different colors for each provider
-- toggle layers
-- mongodb?
