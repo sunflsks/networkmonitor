@@ -10,6 +10,7 @@ import time
 import sys
 import re
 import os
+import random
 from gps import GPSPosition
 
 
@@ -110,3 +111,13 @@ def check_network_is_up(interface) -> bool:
         return False
 
     return True
+
+def generate_random_ping() -> PingResult:
+    return PingResult(
+        hostname="example.com",
+        ip_address="0.0.0.0",
+        latency=int(random.uniform(0, 100)),
+        packet_dropped=False,
+        rssi=random.randint(-100, 0),
+        gpsinfo=GPSPosition(success=False, latitude=-100, longitude=100),
+    )

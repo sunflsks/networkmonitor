@@ -1,8 +1,6 @@
 import threading
 import time
-from cellular import PingResult
 import random
-from gps import GPSPosition
 from constants import LEDCTL
 import subprocess
 
@@ -47,17 +45,6 @@ class RepeatedTimer(object):
         if self._timer:
             self._timer.cancel()
             self.is_running = False
-
-
-def generate_random_ping() -> PingResult:
-    return PingResult(
-        hostname="example.com",
-        ip_address="0.0.0.0",
-        latency=int(random.uniform(0, 100)),
-        packet_dropped=False,
-        rssi=random.randint(-100, 0),
-        gpsinfo=GPSPosition(success=False, latitude=-100, longitude=100),
-    )
 
 
 def blink_led(count, interval):
