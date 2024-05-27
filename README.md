@@ -16,3 +16,7 @@ optimization- different colors for each provider
 - toggle layers
 - mongodb?
 - see if thread immediately quits if cannot upload? if so, fix!
+
+
+## NOTES
+- when soldering modem to rpi, make sure that you solder on the BOTTOM, where the pogo pins come into contact with the pi. (basically making new pads for 5v and GND GPIO pins). don't try to solder through the top, it won't work
