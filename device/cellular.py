@@ -12,6 +12,7 @@ import re
 import os
 import random
 from gps import GPSPosition
+from utils import get_modem_path
 
 
 class PingResult(BaseModel):
@@ -28,11 +29,16 @@ class PingResult(BaseModel):
         super().__init__(**data)
         self.timestamp = time.time_ns() // 1000000
 
+def get_rssi_from_mmcli(mmcli_output):
+        if "rssi: " not in mmcli_output:
+            return 0
 
-def extract_qmi_values(text) -> dict:
-    pattern = r"(\w+):\s'(-?\d+\.?\d* dBm?)'"
-    matches = re.findall(pattern, text)
-    return {key: value for key, value in matches}
+        output_cleaned = [x.strip('LTE |-') for x in mmcli_output.splitlines()]
+
+        for x in output_cleaned:
+            if x.startswith("rssi: "):
+                return int(float(x.replace("rssi:", "").replace("dBm", "").strip()))
+        return 0
 
 
 def extract_ping_details(ping_output) -> dict:
@@ -64,19 +70,18 @@ def ping(interface, ip) -> PingResult | None:
         ping_output = subprocess.check_output(
             ["ping", "-c", "1", "-I", interface, ip], stderr=subprocess.STDOUT
         )
-        qmi_output = subprocess.check_output(
-            [constants.QMICLI_GET_INFO], stderr=subprocess.STDOUT
+        mmcli_output = subprocess.check_output(
+            [constants.MMCLI_WRAPPER, get_modem_path(), "cell"], stderr=subprocess.STDOUT
         )
         ping_result = ping_output.decode("utf-8")
-        qmi_result = qmi_output.decode("utf-8")
+        mmcli_result = mmcli_output.decode("utf-8")
     except subprocess.CalledProcessError as e:
         print(f"Got error {e}: skipping")
         return None
 
     ping_details = extract_ping_details(ping_result)
-    ping_details["rssi"] = int(
-        itemgetter("RSSI")(extract_qmi_values(qmi_result)).split(" ")[0]
-    )
+    ping_details["rssi"] = get_rssi_from_mmcli(mmcli_result)
+    ping_details["success"] = True
 
     return PingResult(**ping_details)
 

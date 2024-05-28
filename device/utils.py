@@ -2,6 +2,7 @@ import threading
 import time
 import random
 from constants import LEDCTL
+import re
 import subprocess
 
 
@@ -47,10 +48,10 @@ class RepeatedTimer(object):
             self._timer.cancel()
             self.is_running = False
 
-
-def blink_led(led, count, interval):
-    for i in range(count):
-        subprocess.run([LEDCTL, led, "on"])
-        time.sleep(interval)
-        subprocess.run([LEDCTL, led, "off"])
-        time.sleep(interval)
+def get_modem_path() -> str:
+    # Example output: /org/freedesktop/ModemManager1/Modem/0 [QUALCOMM INCORPORATED] SIMCOM_SIM7600G-H
+    output = subprocess.check_output(["mmcli", "-L"]).decode("utf-8")
+    match = re.search(r"/org/freedesktop/ModemManager1/Modem/\d+", output)
+    if match:
+        return match.group(0)
+    return ""

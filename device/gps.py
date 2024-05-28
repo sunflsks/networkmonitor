@@ -4,123 +4,55 @@
 # credit to waveshare
 
 from os import times
-from utils import blink_led
+from constants import MMCLI_WRAPPER
+from utils import blink_led, get_modem_path
 import RPi.GPIO as GPIO
 from pydantic import BaseModel
 
 import serial
 import time
 import re
-
-ser = serial.Serial("/dev/ttyS0", 115200)
-ser.flushInput()
-
-power_key = 6
-rec_buff = ""
-rec_buff2 = ""
-time_count = 0
-
-
-class SerialResponse:
-    success = False
-    buffer: str = ""
-
-    def __init__(self, success, buffer):
-        self.success = success
-        self.buffer = buffer
-
+import subprocess
 
 class GPSPosition(BaseModel):
     success: bool = False
-    latitude: float
-    longitude: float
-
-
-def send_at(command, back, timeout) -> SerialResponse:
-    rec_buff = ""
-    ser.write((command + "\r\n").encode())
-    time.sleep(timeout)
-    if ser.inWaiting():
-        time.sleep(0.01)
-        rec_buff = ser.read(ser.inWaiting())
-    if rec_buff != "":
-        if back not in rec_buff.decode():
-            return SerialResponse(False, rec_buff.decode())
-        else:
-            return SerialResponse(True, rec_buff.decode())
-    else:
-        return SerialResponse(False, "none")
-
+    latitude: float = False
+    longitude: float = False
 
 def get_gps_position() -> GPSPosition:  # type: ignore
-    obtaining_lock = True
-    time.sleep(0.5)
+    path = get_modem_path()
 
-    while obtaining_lock:
-        response = send_at("AT+CGPSINFO", "+CGPSINFO: ", 1)
-        if response.success:
-            if ",,,,,," in response.buffer:
-                print("GPS is not ready yet, will retry in 1 second")
-                blink_led("PWR", 1, 0.5)
-                obtaining_lock = True
-                time.sleep(1)
-            else:
-                return parse_gps_position(response.buffer)
+    if path == "":
+        return GPSPosition()
 
-        else:
-            print("error getting gps position")
-            return GPSPosition(success=False, latitude=0, longitude=0)
+    try:
+        result = subprocess.run(
+            [MMCLI_WRAPPER, path, "gps"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
 
+        output = result.stdout
 
-def extract_between_digits(s) -> str | None:
-    # Find the first digit
-    first_digit_match = re.search(r"\d", s)
-    if not first_digit_match:
-        return None  # No digits found
+        if "latitude: " not in output or "longitude: " not in output:
+            return GPSPosition()
 
-    # Find the last digit
-    last_digit_match = re.search(r"\d(?=[^\d]*$)", s)
-    if not last_digit_match:
-        return None  # This shouldn't happen if the first digit is found
+        output_cleaned = [x.strip(' |-') for x in output.splitlines()]
+        gpsposition = GPSPosition()
 
-    # Extract everything between the first and last digit
-    start = first_digit_match.start()
-    end = last_digit_match.end()
-    return s[start:end]
+        for x in output_cleaned:
+            if x.startswith("latitude: "):
+                gpsposition.latitude = float(x.replace("latitude: ", "").strip())
 
+            if x.startswith("longitude: "):
+                gpsposition.longitude = float(x.replace("longitude: ", "").strip())
 
-def parse_gps_position(gps_info) -> GPSPosition:
-    # Remove "+CGPSINFO:" and then split the string by comma
-    parts = extract_between_digits(gps_info)
-    if parts is None:
-        return GPSPosition(success=False, latitude=0, longitude=0)
+        gpsposition.success=True
+        return gpsposition
 
-    parts = parts.split(",")
+    except subprocess.CalledProcessError as e:
+        print(f"Error running mmcli command: {e}")
 
-    # Extract latitude and longitude values
-    lat_value, lat_direction = parts[0], parts[1]
-    lon_value, lon_direction = parts[2], parts[3]
-
-    # Convert to decimal format
-    lat_decimal = convert_to_decimal(lat_value, lat_direction, True)
-    lon_decimal = convert_to_decimal(lon_value, lon_direction, False)
-    return GPSPosition(success=True, latitude=lat_decimal, longitude=lon_decimal)
-
-
-def convert_to_decimal(value, direction, islat) -> float:
-    # for some reason there is a random newline. idc why, no longer
-    value = value.strip()
-
-    # Divide the string into degrees and minutes
-    index = 2 if islat == True else 3
-    degrees = int(value[:index])
-    minutes = float(value[index:])
-
-    # Convert to decimal
-    decimal = degrees + minutes / 60
-
-    # Adjust for South or West coordinates
-    if direction in ["S", "W"]:
-        decimal *= -1
-
-    return decimal
+    return GPSPosition(success=False)
