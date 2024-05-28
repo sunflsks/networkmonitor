@@ -55,3 +55,11 @@ def get_modem_path() -> str:
     if match:
         return match.group(0)
     return ""
+
+
+def blink_led(led, count, interval):
+    for i in range(count):
+        subprocess.run([LEDCTL, led, "on"])
+        time.sleep(interval)
+        subprocess.run([LEDCTL, led, "off"])
+        time.sleep(interval)
