@@ -1,7 +1,7 @@
 [Unit]
 Description=Start networkmonitor script
-After=/dev/cdc-wdm0.path
-Requires=/dev/cdc-wdm0.path
+After=networkmonitor.path
+Requires=networkmonitor.path
 After=ModemManager.service
 Requires=ModemManager.service
 

@@ -1,0 +1,8 @@
+[Unit]
+Description=checks for /dev/cdc-wdm0
+
+[Path]
+PathExists=/dev/cdc-wdm0
+
+[Install]
+WantedBy=multi-user.target
