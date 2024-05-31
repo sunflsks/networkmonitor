@@ -5,7 +5,7 @@ LEDCTL = "/usr/local/lib/networkmonitor/ledctl"
 MMCLI_WRAPPER = "/usr/local/bin/mmcli_wrapper"
 
 # URLs/IP
-SERVER_URL = "http://104.189.146.210:25566"
+SERVER_URL = "https://networkmonitor.sudhip.com"
 PING_ADDRESS = "8.8.8.8"
 
 # Interface/Cellular
