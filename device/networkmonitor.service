@@ -1,0 +1,15 @@
+[Unit]
+Description=Start networkmonitor script
+After=/dev/cdc-wdm0.path
+Requires=/dev/cdc-wdm0.path
+After=ModemManager.service
+Requires=ModemManager.service
+
+[Service]
+User=${USER}
+Group=${GROUP}
+ExecStartPre=+/usr/local/share/networkmonitor/src/device/setup/init.sh
+ExecStart=/usr/local/share/networkmonitor/src/device/main.py
+
+[Install]
+WantedBy=multi-user.target
