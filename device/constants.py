@@ -1,7 +1,7 @@
 # Local paths
 MMCLI = "/usr/bin/mmcli"
 SQLITE_DB_PATH = "/home/sunchipnacho/ping_results.db"
-LEDCTL = "/usr/local/lib/networkmonitor/ledctl"
+LEDCTL = "/usr/local/bin/ledctl"
 MMCLI_WRAPPER = "/usr/local/bin/mmcli_wrapper"
 
 # URLs/IP
