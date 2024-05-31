@@ -5,6 +5,8 @@ if [ $UID -ne 0 ]; then
     exit 1
 fi
 
+sleep 15
+
 echo none > /sys/class/leds/ACT/trigger
 echo none > /sys/class/leds/PWR/trigger
 
