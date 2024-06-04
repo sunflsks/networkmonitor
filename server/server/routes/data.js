@@ -21,7 +21,7 @@ router.get('/', function (req, res, next) {
 
   console.log(ts)
 
-  pool.query('SELECT coordinates, rssi, timestamp FROM results WHERE timestamp > $1 AND (coordinates <@ box(point($2, $3),point($4, $5)))', [dateToSQLRepresentation(ts), nelat, nelng, swlat, swlng], function (err, rows) {
+  pool.query('SELECT coordinates, rssi, timestamp, provider FROM results WHERE timestamp > $1 AND (coordinates <@ box(point($2, $3),point($4, $5)))', [dateToSQLRepresentation(ts), nelat, nelng, swlat, swlng], function (err, rows) {
     if (err) {
       console.log(err)
       res.status(500).send('Error querying database')
