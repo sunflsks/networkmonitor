@@ -34,7 +34,7 @@ const colorRanges =
 
 const hexLayersForProvider = {}
 
-const legend = L.control({ position: 'bottomleft' })
+const legend = L.control({ position: 'topright' })
 legend.onAdd = function (map) {
   const div = L.DomUtil.create('div', 'info legend')
 
