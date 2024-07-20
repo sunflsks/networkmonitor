@@ -1,22 +1,16 @@
 # TODO:
 
 ## DEVICE
-SWITCH TO MODEMMANAGER, WILL PROBABLY BE WAY EASIER TO MANAGE
-
-sudo systemctl start ModemManager
-sudo mmcli -m 0 --enable
-mmcli -m 0 --simple-connect="apn=TFDATA"
-
-get modemmanager running on startup
-see if modemmanager setup needs to be run once or on each startup
-get running with NetworkManager as well, so udhcpcd does not need to be run on each startup
+SWITCH TO MODEMMANAGER, WILL PROBABLY BE WAY EASIER TO MANAGE (Done!)
 
 ## SERVER
-optimization- different colors for each provider
-- toggle layers
-- mongodb?
-- see if thread immediately quits if cannot upload? if so, fix!
+Optimization- different colors for each provider
+- Toggle layers (Done)
+- Postgres? (Done)
+- See if thread immediately quits if cannot upload? if so, fix! (Done)
+- Switch to using PostGIS instead of dealing with the coordinates directly
+- **BIG: consolidate points so the client doesn't download every single datapoint in a given window**
 
 
 ## NOTES
-- when soldering modem to rpi, make sure that you solder on the BOTTOM, where the pogo pins come into contact with the pi. (basically making new pads for 5v and GND GPIO pins). don't try to solder through the top, it won't work
+- When soldering modem to rpi, make sure that you solder on the BOTTOM, where the pogo pins come into contact with the pi. (basically making new pads for 5v and GND GPIO pins). don't try to solder through the top, it won't work
